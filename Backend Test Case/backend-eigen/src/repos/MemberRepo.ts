@@ -63,6 +63,17 @@ async function insertMult(users: IUser[]): Promise<IUser[]> {
   return users;
 }
 
+async function penalizeMember(member_code: string, returnDate: Date): Promise<void> {
+  const penalizedUntil = new Date(returnDate);
+  penalizedUntil.setDate(penalizedUntil.getDate() + 3); // 3 days after return date
+
+  await pool.query(
+      'UPDATE members SET isPenalized = TRUE, penalizedUntil = ? WHERE code = ?',
+      [penalizedUntil, member_code]
+  );
+}
+
+
 export default {
   getOne,
   persists,
@@ -72,4 +83,5 @@ export default {
   delete: delete_,
   deleteAllUsers,
   insertMult,
+  penalizeMember
 } as const;

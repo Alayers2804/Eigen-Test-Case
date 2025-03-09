@@ -67,8 +67,9 @@ app.use(express.static(staticDir));
 
 // Nav to users pg by default
 app.get('/', (_: Request, res: Response) => {
-  res.send('Hello, World!');
+  return res.sendFile('index.html', { root: viewsDir });
 });
+
 
 /******************************************************************************
                                 Export default

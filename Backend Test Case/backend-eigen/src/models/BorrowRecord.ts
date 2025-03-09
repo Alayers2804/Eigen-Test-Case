@@ -13,7 +13,6 @@ export interface IBorrowRecord {
   book_code: string;
   borrow_date?: Date;
   return_date?: Date | null;
-  penalty_until?: Date | null;
 }
 
 /******************************************************************************
@@ -26,7 +25,6 @@ const BorrowRecord = schema<IBorrowRecord>({
   book_code: isRelationalKey,
   borrow_date: (val) => val === undefined || val instanceof Date,
   return_date: (val) => val === undefined || val === null || val instanceof Date,
-  penalty_until: (val) => val === undefined || val === null || val instanceof Date,
 });
 
 /******************************************************************************

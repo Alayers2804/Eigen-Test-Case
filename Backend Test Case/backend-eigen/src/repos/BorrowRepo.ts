@@ -27,17 +27,17 @@ async function getByUid(uid: string): Promise<IBorrowRecord | null> {
 
 async function add(record: Omit<IBorrowRecord, 'id'>): Promise<void> {
     await pool.query(
-      'INSERT INTO borrow_records (uid, member_code, book_code, borrow_date, return_date, penalty_until) VALUES (UUID(), ?, ?, ?, ?, ?)',
-      [record.member_code, record.book_code, record.borrow_date, record.return_date, record.penalty_until]
+      'INSERT INTO borrow_records (uid, member_code, book_code, borrow_date, return_date) VALUES (UUID(), ?, ?, ?, ?, ?)',
+      [record.member_code, record.book_code, record.borrow_date, record.return_date]
     );
   }
 
-async function update(record: Partial<IBorrowRecord>): Promise<void> {
-  await pool.query(
-    'UPDATE borrow_records SET return_date = ?, penalty_until = ? WHERE uid = ?',
-    [record.return_date, record.penalty_until, record.uid]
-  );
-}
+  async function update(record: Partial<IBorrowRecord>): Promise<void> {
+    await pool.query(
+      'UPDATE borrow_records SET return_date = ? WHERE uid = ?',
+      [record.return_date, record.uid]
+    );
+  }
 
 async function isBookBorrowed(book_code: string): Promise<boolean> {
     const [rows] = await pool.query<RowDataPacket[]>(
@@ -56,13 +56,14 @@ async function countBooksBorrowed(member_code: string): Promise<number> {
     return rows[0].count;
   }
 
-async function isMemberPenalized(member_code: string): Promise<boolean> {
+  async function isMemberPenalized(member_code: string): Promise<boolean> {
     const [rows] = await pool.query<RowDataPacket[]>(
-      'SELECT 1 FROM borrow_records WHERE member_code = ? AND penalty_until > NOW()',
+      'SELECT 1 FROM members WHERE code = ? AND isPenalized = TRUE',
       [member_code]
     );
     return rows.length > 0;
-  }
+}
+
 
 async function getAvailableBooks(): Promise<RowDataPacket[]> {
     const [rows] = await pool.query<RowDataPacket[]>(`
